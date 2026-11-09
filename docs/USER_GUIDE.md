@@ -49,7 +49,7 @@ The fastest way to learn the canvas is to run one takeoff end to end on the bund
 
 1. **Load the sample.** On the opening screen, click **Load sample plan**—a real medical-center floor finish plan. (Your own plans: drag a PDF anywhere onto the page.)
 2. **Accept the scale.** Open the **Set scale…** chip in the toolbar. The plan's drawn scale note has already been read off the sheet—click **Plan says 1/8″ = 1′-0″ — use it**. A calibrated ruler bar flashes on the sheet for a few seconds so you can eyeball that it's right (a door opening is about 3′).
-3. **Choose a condition.** A fresh workspace ships with a starter set of flooring conditions—CPT-1, LVT-1, CT-1, and friends. Press `1` to arm the first (the number keys answer in list order until you pin your own palette), or open the **☰ Takeoffs** rail button and click one.
+3. **Create a condition.** A fresh workspace starts blank. Open **☰ Takeoffs** to add a condition, apply a saved Library template, or import the project's finish schedule. Then select the condition before measuring; number keys arm conditions in list order until you pin your own palette.
 4. **Trace the rooms.** Press `A`, click the room's corners, `⏎` closes it. (One-Click Area — press `O`, click inside a room, it traces itself — is **temporarily gated** while the flood engine is re-validated; [§6](#6-one-click-area) says what that means.)
 5. **Read the report.** Open **Report** for the per-condition breakdown—SF, SY, waste-adjusted order quantities, and the materials buy list. Export **CSV**, **Excel**, or a **Marked set** PDF.
 
@@ -270,7 +270,7 @@ The **`ft` / `m`** toggle beside the Scale chip switches the whole display layer
 
 ## 4. Conditions — your finishes
 
-A **condition** is one finish—`LVT-1`, `CPT-2`, `RB-1`—and it's what every measurement commits into. A fresh workspace seeds a flooring starter set (CPT-1, BRD-1, LVT-1, WD-1, VCT-1, SV-1, CT-1, RB-1, TR-1), several with real supporting materials already attached—CT-1 arrives with thinset and a grout line whose coverage derives from tile geometry.
+A **condition** is one finish—`LVT-1`, `CPT-2`, `RB-1`—and it's what every measurement commits into. New projects start with no conditions, even when the Library contains templates. Add your own, apply selected templates, or import the project's finish schedule. Existing project conditions and measurements are preserved when reopened.
 
 ### Creating, editing, deleting
 
@@ -298,7 +298,7 @@ The band under the toolbar is your working set: **pin** a condition there (the p
 The **☰ Takeoffs** rail button docks the panel (it starts collapsed; the palette band is the primary surface). Four tabs:
 
 - **Takeoffs**—every condition with live totals for the open sheets (`SF · SF wall · LF · EA`), an **eye** that leads the row (click hides or shows that condition's takeoffs on the plan, count marks included; **⌥-click** shows only that one, and again restores the rest—a view only: hidden work still counts in totals, the Report and every export, and a red bar above the list counts what's hidden with **Show all**), a shape count, a **⌖** that zooms the canvas to the condition's takeoffs (double-clicking the row does the same), the Supporting Materials button, the pin, and delete. Above the list: a filter box, **A→Z** natural sort and **≡ grp** tag-family grouping (views only—hotkey numbering never changes). **⌘-click / ⇧-click** rows to bulk-select conditions, then set waste or line color on all of them, or bulk-delete.
-- **Library**—reusable condition templates, shared across every plan in this browser. **+ save 〈tag〉 to the library** snapshots the active condition (appearance, waste, H/T, materials); **Apply** adds it to any project as a fresh condition. A fresh workspace seeds from this library—tune your house conditions once and every new job starts with them.
+- **Library**—reusable condition templates, shared across every plan in this browser. **+ save 〈tag〉 to the library** snapshots the active condition (appearance, waste, H/T, materials); **Apply** adds it to any project as a fresh condition. New projects start blank; apply the templates you need explicitly.
 - **Materials**—a browser-wide materials library. Attaching a library material to a condition copies its values and keeps a link (⛓); library edits reach linked lines only when you push them, and overridden fields show amber with a per-field ↺ revert.
 - **Columns**—project-wide **custom columns** (for example, *CSI Division*) that classify conditions for report grouping and exports, and the **shape-label vocabulary** (§7).
 

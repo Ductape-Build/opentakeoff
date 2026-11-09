@@ -40,6 +40,10 @@ it, and whether a person or an agent drew it.
 > plan corpus. Trace rooms with **Area** (`A`) in the canvas and `measure_polygon` over MCP.
 > Every other tool works as normal. See [`docs/design/ONE_CLICK_GATE.md`](docs/design/ONE_CLICK_GATE.md).
 
+## Ductape-Build customization
+
+New projects start with no takeoff conditions. Add conditions yourself, import a project schedule, or explicitly apply your saved Library templates. Existing project conditions and measurements are preserved. Upstream: [Kentucky-ai/opentakeoff](https://github.com/Kentucky-ai/opentakeoff).
+
 ## Pick your door
 
 | | You are… | Start here | Time |

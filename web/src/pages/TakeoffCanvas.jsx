@@ -2255,7 +2255,7 @@ export default function TakeoffCanvas() {
     const { conditions: conds, repaired: multRepaired } = repairConditionMultipliers(sanitizeConditionAttrs(a.conditions || []));   // strips corrupt attrs values so every reader can trust them (the client_info precedent)
     if (multRepaired.length) setCommitMsg(describeMultiplierRepair(multRepaired));
     if (conds.length) { setConditions(conds); setActiveCond(conds[0].id); }
-    else { const seeded = seedConditions(templatesRef.current); setConditions(seeded); setActiveCond(seeded[0].id); }   // library templates first, flooring defaults as fallback
+    else { const seeded = seedConditions(); setConditions(seeded); setActiveCond(null); }   // blank project; templates are applied explicitly
     // palette holds condition ids — de-dupe (a hand-edited/older payload could
     // repeat one, which would collide React keys and double-map a hotkey), drop
     // any that don't resolve in the loaded set, and cap defensively; a seeded

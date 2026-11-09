@@ -13,7 +13,6 @@ import { PALETTE } from "../components/hatches.jsx";
 import {
   MIN_SCALE, MAX_SCALE,
   QUALITY_CEILING, MAX_CANVAS_DIM, MAX_PANEL_AREA,
-  FLOORING_DEFAULTS,
 } from "./canvasConstants.js";
 
 // Largest pdf.js render scale a wPt×hPt-point page can use within the base budget;
@@ -86,7 +85,6 @@ export const conditionToTemplate = (c) => ({
   // ids are minted on instantiation; grout never shared by reference; prices are per project (lib/estimate.js), never carried by a template
   materials: (c.materials || []).map(({ id: _id, price: _price, labor_price: _labor, ...m }) => (m.grout ? { ...m, grout: { ...m.grout } } : m)),
 });
-// Fresh-workspace seeding reads the user's template library first; the
-// built-in flooring defaults are only the empty-library fallback. Both paths
-// run instantiateTemplate — ONE condition constructor, no drift.
-export const seedConditions = (library) => (library?.length ? library : FLOORING_DEFAULTS).map(instantiateTemplate);
+// New projects always start blank. Templates stay in the Library and are
+// applied explicitly; never infer project scope from built-ins or saved templates.
+export const seedConditions = () => [];
