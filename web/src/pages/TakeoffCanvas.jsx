@@ -190,6 +190,7 @@ import ConditionsDock from "../components/ConditionsDock.jsx";
 import { useWorkspaceLayout, WorkspaceLayoutDialog, DockHandle, DockTargets } from "../components/WorkspaceLayout.jsx";
 import AiSettings from "../components/AiSettings.jsx";
 import { agentToolDefs, executeAgentTool, agentScaleGate } from "../lib/agentTools.js";
+import { startLocalAgentLink } from "../lib/localAgentLink.js";
 import { runAgentLoop } from "../lib/agentLoop.js";
 import { runVoiceCommand, isAgentHandoffTrigger, shouldOfferAgentHandoff } from "../lib/voiceActions";
 import { createVoiceRecognizerClient } from "../lib/voiceRecognizerClient";
@@ -7852,6 +7853,23 @@ export default function TakeoffCanvas() {
     }
   }
   const stopAgent = () => agentAbortRef.current?.abort();
+
+  // Local desktop agent reads the live canvas, not a separate MCP file session.
+  // A ref keeps async commands on the latest render; StrictMode cleanup stops polling.
+  const localAgentExecuteRef = useRef(null);
+  localAgentExecuteRef.current = async (name, args) => {
+    if (name === "describe_tools") return { tools: agentToolDefs() };
+    const ctx = buildAgentCtx();
+    if (name === "workspace_state") return {
+      status, project_name: projectName, focused_sheet: sheetKey,
+      sheets: ctx.listSheets(), conditions: ctx.getConditions(),
+      shapes, pending_proposals: agentProposals,
+    };
+    const notReady = notReadyMessage(agentStateRef.current.status);
+    if (notReady) return { error: notReady };
+    return executeAgentTool(ctx, name, args);
+  };
+  useEffect(() => startLocalAgentLink((name, args) => localAgentExecuteRef.current(name, args)), []);
 
   // ── Copy text (#471) ──────────────────────────────────────────────────────
   // A box (or the whole page) → the reader chain → reading-order lines → the

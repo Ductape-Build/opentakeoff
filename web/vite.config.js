@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { localAgentBridge } from "./scripts/local-agent-bridge.mjs";
 
 // The one source of truth for the app version — package.json — inlined as
 // __APP_VERSION__ so contributions can carry generator_version without a
@@ -17,7 +18,7 @@ const pkg = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), 
 // model AI sandbox in `../server` (see server/README.md). Without it, the app
 // works fully; the AI hooks just stay dormant.
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), localAgentBridge()],
   define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   // On-device OCR (#469): ppu-paddle-ocr imports the bare `onnxruntime-web`,
   // which would bundle ORT's default (jsep) build and ship a second ~24 MB

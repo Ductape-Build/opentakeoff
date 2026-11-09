@@ -44,6 +44,8 @@ it, and whether a person or an agent drew it.
 
 New projects start with no takeoff conditions. Add conditions yourself, import a project schedule, or explicitly apply your saved Library templates. Existing project conditions and measurements are preserved. Upstream: [Kentucky-ai/opentakeoff](https://github.com/Kentucky-ai/opentakeoff).
 
+Local desktop agents can also control the open canvas through the opt-in [local agent bridge](docs/LOCAL_AGENT.md), rather than a separate file-based MCP session. Measurement proposals still require human review.
+
 ## Pick your door
 
 | | You are… | Start here | Time |

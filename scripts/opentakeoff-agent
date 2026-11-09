@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+"""Call the live OpenTakeoff canvas: opentakeoff-agent TOOL '{"arg":"value"}'."""
+import json
+from pathlib import Path
+import sys
+import urllib.request
+import urllib.error
+
+try:
+    token = (Path.home() / '.local/state/opentakeoff/agent-token').read_text().strip()
+    name = sys.argv[1] if len(sys.argv) > 1 else 'workspace_state'
+    args = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
+    endpoint = 'status' if name == 'status' else 'call'
+    data = None if endpoint == 'status' else json.dumps({'name': name, 'args': args}).encode()
+    request = urllib.request.Request('http://127.0.0.1:5173/__agent/' + endpoint, data=data,
+        headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'})
+    with urllib.request.urlopen(request, timeout=65) as response:
+        print(json.dumps(json.load(response), indent=2))
+except urllib.error.HTTPError as error:
+    print(error.read().decode(), file=sys.stderr)
+    sys.exit(1)
+except Exception as error:
+    print(str(error), file=sys.stderr)
+    sys.exit(1)

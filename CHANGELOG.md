@@ -15,6 +15,8 @@ Click **Pin** beside **Sheets** in the top toolbar, then click two corners aroun
 
 ## Unreleased
 
+- **Ductape-Build fork: live canvas agent control.** Opt-in authenticated loopback bridge exposes the existing browser agent tools to local agents; reads the open project directly and stages geometry through the existing human review gate. See `docs/LOCAL_AGENT.md`.
+
 - **Ductape-Build fork: blank project conditions.** New projects no longer seed flooring conditions or auto-apply Library templates. Templates remain available to apply manually; existing project conditions and measurements are unchanged.
 
 - **A Trade view on the canvas.** The status bar's new **Trade** picker shows one trade at a time: All trades, Finishes, Roofing, Siding, Soffit & fascia, Glazing, Doors, Plumbing or Electrical, each with its condition count. Other trades' conditions leave the Condition list and the Takeoffs panel, and their shapes hide on the canvas; the Report, estimate and exports still carry everything. A condition made while a trade is showing is booked to it. A condition's trade is set in its properties (**Trade**), or read from its tag prefix (`RF-`, `SD-`, `SF-`, `GL-`, `DR-`/`HW-`, `P-`, `E-`/`FA-`/`LV-`), else Finishes, so takeoffs from before this read as finishes. The panel's "Roofing · 9 hidden ×" note goes back to All trades. The choice is yours and is saved in this browser, not in the project.
