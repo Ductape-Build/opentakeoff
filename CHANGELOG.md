@@ -15,6 +15,8 @@ Click **Pin** beside **Sheets** in the top toolbar, then click two corners aroun
 
 ## Unreleased
 
+- **Ductape-Build fork: bulk scale.** Scale → Apply scale to sheets scans all loaded PDF pages and applies a chosen scale to selected unscaled sheets. Select matching sheets excludes unknown, mixed and conflicting printed scales. Existing calibrations are never overwritten; closed sheets with dimensional work are protected. Open-sheet quantities are recalculated in one update. See `docs/BULK_SCALE.md`.
+
 - **Ductape-Build fork: live canvas agent control.** Opt-in authenticated loopback bridge exposes the existing browser agent tools to local agents; reads the open project directly and stages geometry through the existing human review gate. See `docs/LOCAL_AGENT.md`.
 
 - **Ductape-Build fork: blank project conditions.** New projects no longer seed flooring conditions or auto-apply Library templates. Templates remain available to apply manually; existing project conditions and measurements are unchanged.

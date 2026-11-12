@@ -191,6 +191,8 @@ import { useWorkspaceLayout, WorkspaceLayoutDialog, DockHandle, DockTargets } fr
 import AiSettings from "../components/AiSettings.jsx";
 import { agentToolDefs, executeAgentTool, agentScaleGate } from "../lib/agentTools.js";
 import { startLocalAgentLink } from "../lib/localAgentLink.js";
+import BulkScaleDialog from "../components/BulkScaleDialog.jsx";
+import { planBulkScale } from "../lib/bulkScale.js";
 import { runAgentLoop } from "../lib/agentLoop.js";
 import { runVoiceCommand, isAgentHandoffTrigger, shouldOfferAgentHandoff } from "../lib/voiceActions";
 import { createVoiceRecognizerClient } from "../lib/voiceRecognizerClient";
@@ -583,6 +585,7 @@ export default function TakeoffCanvas() {
   };
 
   const [scales, setScales] = useState({});
+  const [bulkScaleOpen, setBulkScaleOpen] = useState(false);
   const [scaleSources, setScaleSources] = useState({}); // scale provenance for the report — typically "calibrated" | "standard" | "detected", but any string a newer build wrote is kept verbatim; sheets that predate the flag export "unknown"
   // Scale gate — agent proposes, human confirms. A key mapped to false means an
   // AGENT set this sheet's scale (MCP set_scale, arriving by import) and no
@@ -2224,6 +2227,7 @@ export default function TakeoffCanvas() {
   // Restore in the Revisions panel, so a restored revision walks the same
   // defensive path as a page reload.
   const hydrate = (a) => {
+    setBulkScaleOpen(false);
     // Same cross-load-transient gap as the panel epoch bump below: a revision
     // Restore runs in-place with the same sheet keys, so a surviving zoneCheck
     // would immediately re-classify the RESTORED shape set against the
@@ -5239,6 +5243,58 @@ export default function TakeoffCanvas() {
     // stale quantities.
     const repriced = new Map(recalibrateShapes(shapes.filter((sh) => sh.sheet_id === key), sp.img, uEff, conditions).map((sh) => [sh.id, sh]));
     dispatchShape({ type: "replace", shapes: shapes.map((sh) => repriced.get(sh.id) || sh) }, { reset: true });
+  }
+
+  // Read the whole set without rendering pages or changing active tabs.
+  async function scanBulkScaleSheets(signal, progress) {
+    const rows = [];
+    for (const file of sheets) {
+      if (signal.aborted) break;
+      try {
+        await docCache.withDoc(file.name, async pdf => {
+          rememberPages(file.name, pdf.numPages);
+          for (let page = 1; page <= pdf.numPages; page++) {
+            if (signal.aborted) break;
+            const key = page === 1 ? file.name : `${file.name}#${page}`;
+            progress(`Reading ${file.name} — page ${page} of ${pdf.numPages}…`);
+            try {
+              const pg = await pdf.getPage(page);
+              const text = await pg.getTextContent();
+              if (signal.aborted) break;
+              const viewport = pg.getViewport({ scale: RENDER_SCALE });
+              const number = extractSheetNumber(text, viewport);
+              rows.push({ key, label: `${number || `Page ${page}`} — ${file.name} (p. ${page})`, detected: detectScale(text, viewport) });
+            } catch (error) {
+              rows.push({ key, label: `${file.name} (p. ${page})`, error: `Could not read sheet: ${error.message}` });
+            }
+          }
+        });
+      } catch (error) {
+        rows.push({ key: file.name, label: file.name, error: `Could not open PDF: ${error.message}` });
+      }
+    }
+    return rows;
+  }
+
+  function applyBulkScale(rows, selected, upp) {
+    const openKeys = new Set(panels.filter(p => p.img?.w).map(p => p.key));
+    const { keys, skipped } = planBulkScale(rows, selected, upp, scales, shapes, openKeys);
+    if (!keys.length) { setCommitMsg("No unscaled sheets eligible — existing scales were kept."); setBulkScaleOpen(false); return; }
+    const next = Object.fromEntries(keys.map(key => [key, upp]));
+    setScales(old => ({ ...old, ...next }));
+    setScaleSources(old => ({ ...old, ...Object.fromEntries(keys.map(key => [key, STANDARD_SCALES.some(s => Math.abs(s.upp - upp) < 1e-9) ? "standard" : "calibrated"])) }));
+    setScaleUnconfirmed(old => Object.fromEntries(Object.entries(old).filter(([key]) => !keys.includes(key))));
+    const repriced = new Map();
+    for (const key of keys) {
+      maskCacheRef.current.delete(key);
+      rasterMaskCacheRef.current.delete(key);
+      const p = panels.find(panel => panel.key === key && panel.img?.w);
+      if (p) for (const shape of recalibrateShapes(shapes.filter(sh => sh.sheet_id === key), p.img, upp / factorFor(key), conditions)) repriced.set(shape.id, shape);
+    }
+    if (repriced.size) dispatchShape({ type: "replace", shapes: shapes.map(sh => repriced.get(sh.id) || sh) }, { reset: true });
+    setBulkScaleOpen(false);
+    setCommitMsg(`Scale applied to ${keys.length} sheet(s). Existing scales kept.${skipped.length ? ` ${skipped.length} skipped.` : ""}`);
+    if (keys.includes(focusPanel.key)) showScaleGuide(focusPanel.key, upp, STANDARD_SCALES.find(s => Math.abs(s.upp - upp) < 1e-9)?.label || "bulk scale");
   }
 
   // Revert the last quantity-changing rescale (the one-slot stash above): runs
@@ -9297,6 +9353,8 @@ export default function TakeoffCanvas() {
   scaleItems.push("divider");
   scaleItems.push({ id: "calibrate", icon: "calibrate", label: "Calibrate two points…", title: "Calibrate — click two points of a known dimension", active: tool === "calibrate", onSelect: () => setTool("calibrate") });
   scaleItems.push({ id: "check", icon: "check", label: "Check a dimension…", shortcut: "K", title: "Check a dimension (K) — click both ends of a printed dimension string; compares the measured length against what the drawing says", active: tool === "check", onSelect: () => setTool("check") });
+  scaleItems.push("divider");
+  scaleItems.push({ id: "bulk-scale", icon: "scaleRule", label: "Apply scale to sheets…", onSelect: () => setBulkScaleOpen(true) });
   scaleItems.push({ note: "Remembered per sheet." });
 
   // One-Click fill sensitivity — lives in the render menu now, so arming
@@ -11840,6 +11898,9 @@ export default function TakeoffCanvas() {
       {/* BYO-key AI settings — the single config surface for the ai.js seam
           (the Agent panel links here; closing re-renders, so `configured`
           re-reads immediately). */}
+      {bulkScaleOpen && <BulkScaleDialog initialUpp={scales[focusPanel.key] || scaleDet?.upp} scan={scanBulkScaleSheets}
+        scales={scales} shapes={shapes} openKeys={new Set(panels.filter(p => p.img?.w).map(p => p.key))}
+        onApply={applyBulkScale} onClose={() => setBulkScaleOpen(false)} onMenuDepth={onMenuDepth} />}
       {showAiSettings && <AiSettings onClose={() => setShowAiSettings(false)} />}
       {/* live counter (mock) — floating running totals, drag to park anywhere */}
       {!focusMode && (!workspaceLayout || workspaceArrangement.counter) && !agentOpen && !showReport && <LiveCounter rows={liveCounterRows} onActivate={(id) => activateCondition(id, { reassign: false })} />}

@@ -218,7 +218,7 @@ One-Click preserves retained interior voids as part of the shape through preview
 During sync, calibrations on different sheets merge independently. If concurrent changes combine geometry and differing calibrations on the same sheet, that sheet's remote measurements and calibration stay together. Your local work is preserved in **Merge backup** in Revisions for recovery.
 
 
-Scale is the foundation. Every square foot on your report is pixels × scale², so a wrong scale is every number wrong at once. OpenTakeoff treats scale accordingly: it's **per sheet**, it's verified visually on every acceptance, and nothing prices without it.
+Scale is the foundation. Every square foot on your report is pixels × scale², so a wrong scale is every number wrong at once. Scale is stored **per sheet**. You can set it individually or apply one scale to selected unscaled sheets with the bulk dialog below. Verify it against known dimensions before measuring.
 
 ### What refuses to work without a scale
 
@@ -991,6 +991,14 @@ Open **Work**, then select **Agent**. It is a chat window: ask about the project
 - **`propose_shapes`**—stage proposals for your review.
 
 Proposals include evidence fields. Inspect the boundary and its claimed evidence before accepting it; those fields do not independently verify the geometry. The answer appears as the model writes it, word by word; a tool call runs only once the model has finished sending it. Endpoints that don't stream (some local runtimes) still work: the app asks once, and if the endpoint refuses or answers all at once, the reply arrives whole. Each reply shows the model's answer, how many proposals it staged, and a **Show every step** list—every tool call with a short label and its status (running, done, failed), refusals included—capped at 24 model turns, with a **■ Stop** button that stops the run (mid-answer too: the words that already arrived stay, marked stopped). With no model connected, the tab shows a connect card: **AI settings…** for your own key, or **Connect your AI** to drive OpenTakeoff from Claude Desktop, Codex or Cursor over MCP instead.
+
+### Apply a scale across the set (Ductape-Build fork)
+
+Open the **Scale** menu → **Apply scale to sheets…**. The dialog reads the printed scale on every page of every loaded PDF, without changing tabs. Choose the scale once, click **Select matching sheets**, then **Apply to N sheet(s)**. Each selected page gets its own saved scale in the same action.
+
+Sheets without a printed scale, with multiple scales, or with a conflicting scale show a warning and are not selected by **Select matching sheets**. Select a warning row manually only after verifying it. Existing scales/calibrations are disabled and never overwritten. A closed sheet with dimensional measurements is protected: open it before recalculating its work. Stitched composites are not bulk targets; verify those separately. Nothing changes until you click **Apply**; Cancel leaves scales untouched.
+
+See [bulk scale verification](BULK_SCALE.md) for test evidence and limitations.
 
 ### The scale gate holds
 
