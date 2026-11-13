@@ -180,7 +180,7 @@ import AgentChat from "../components/AgentChat.jsx";
 import "../styles/agentChat.css";
 import { useAgentChat } from "../lib/useAgentChat.js";
 import { historyMessages, notReadyMessage, withViewContext } from "../lib/agentChat.js";
-import { ScanStar, OtLockup } from "../brand/marks.jsx";
+import { ScanStar, CdbBrand } from "../brand/marks.jsx";
 import WorkspacePanel from "../components/WorkspacePanel.jsx";
 import { openPremiumPricing } from "../lib/premiumPlans.js";
 import "../styles/premiumWorkspace.css";
@@ -191,6 +191,7 @@ import { useWorkspaceLayout, WorkspaceLayoutDialog, DockHandle, DockTargets } fr
 import AiSettings from "../components/AiSettings.jsx";
 import { agentToolDefs, executeAgentTool, agentScaleGate } from "../lib/agentTools.js";
 import { startLocalAgentLink } from "../lib/localAgentLink.js";
+import { validateUnusedConditionRemoval } from "../lib/liveConditions.js";
 import BulkScaleDialog from "../components/BulkScaleDialog.jsx";
 import { planBulkScale } from "../lib/bulkScale.js";
 import { runAgentLoop } from "../lib/agentLoop.js";
@@ -7913,14 +7914,31 @@ export default function TakeoffCanvas() {
   // Local desktop agent reads the live canvas, not a separate MCP file session.
   // A ref keeps async commands on the latest render; StrictMode cleanup stops polling.
   const localAgentExecuteRef = useRef(null);
+  const liveIdentityRef = useRef(null);
+  if (!liveIdentityRef.current) liveIdentityRef.current = { id: crypto.randomUUID(), serial: "", revision: 0, removing: false };
   localAgentExecuteRef.current = async (name, args) => {
     if (name === "describe_tools") return { tools: agentToolDefs() };
     const ctx = buildAgentCtx();
-    if (name === "workspace_state") return {
+    const snapshot = buildPayload();
+    const live = liveIdentityRef.current;
+    const serial = JSON.stringify({ snapshot, sheets: sheets.map(s => ({ name: s.name, key: s.key })), pending: agentProposals });
+    if (serial !== live.serial) { live.serial = serial; live.revision++; live.removing = false; }
+    const state = {
+      workspace_id: `${live.id}:${projectIdFromUrl() || "local"}`, revision: String(live.revision),
       status, project_name: projectName, focused_sheet: sheetKey,
-      sheets: ctx.listSheets(), conditions: ctx.getConditions(),
-      shapes, pending_proposals: agentProposals,
+      sheets: ctx.listSheets(), source_files: sheets.map(s => s.name), conditions: ctx.getConditions(),
+      shapes, pending_proposals: agentProposals, snapshot,
     };
+    if (name === "workspace_state") return state;
+    if (name === "remove_unused_conditions") {
+      if (status !== "ready" || live.removing) throw new Error("Canvas not ready or removal awaiting render; inspect state");
+      const ids = validateUnusedConditionRemoval(state, args);
+      live.removing = true;
+      deleteConditions(new Set(ids));
+      // Invalidate the pre-write revision synchronously; never replay an old command.
+      live.revision++;
+      return { removed: args.conditions, workspace_id: state.workspace_id };
+    }
     const notReady = notReadyMessage(agentStateRef.current.status);
     if (notReady) return { error: notReady };
     return executeAgentTool(ctx, name, args);
@@ -8417,28 +8435,18 @@ export default function TakeoffCanvas() {
     if (!c) return;
     const owned = shapes.filter((s) => s.condition_id === id);
     if (owned.length && !window.confirm(`Delete ${c.finish_tag} and its ${owned.length} takeoff${owned.length === 1 ? "" : "s"}? This can't be undone.`)) return;
-    // Lineage first, removal second: deleting a family parent must not orphan its twins. The
-    // eldest survivor is promoted to root (its rows are already materialized — propagate-on-write
-    // guarantees that) and the rest re-point at it, origin_ids remapped.
-    const next = promoteOnDelete(conditions, new Set([id])).filter((x) => x.id !== id);
-    // cascade delete of the condition's OWNED shapes — counted centrally by the
-    // command, but record:false keeps it off the undo stack: the confirm just
-    // said "can't be undone", and ⌘Z restoring shapes without their condition
-    // would resurrect orphans
+    deleteConditions(new Set([id]));
+  }
+
+  function deleteConditions(ids) {
+    const next = promoteOnDelete(conditions, ids).filter((x) => !ids.has(x.id));
+    const owned = shapes.filter(s => ids.has(s.condition_id));
     if (owned.length) dispatchShape({ type: "delete", ids: owned.map((s) => s.id), reason: "condition-delete" }, { record: false });
     setConditions(next);
-    // Annotations are NOT owned by the condition the way shapes are — a cloud
-    // saying "verify substrate here" outlives the takeoff line it was drawn
-    // against. Clear the dangling pointer and keep the markup, same rule
-    // deleteRfi follows: leave no orphan link, but never delete someone's note
-    // as a side effect of deleting a quantity.
-    setMarkups((ms) => ms.map((m) => (m.condition_id === id ? { ...m, condition_id: "" } : m)));
-    unpinFromPalette(id);   // a deleted condition can't stay pinned in the palette
-    if (activeCond === id) setActiveCond(next[0]?.id || "");
-    // no bulk-selection pruning needed here: the panel derives liveness from
-    // the conditions prop (liveChecked = conditions ∩ checked), so a deleted
-    // id left in its checked set is inert by construction
-    setCommitMsg(`Deleted ${c.finish_tag}${owned.length ? ` and ${owned.length} takeoff${owned.length === 1 ? "" : "s"}` : ""}.`);
+    setMarkups((ms) => ms.map((m) => (ids.has(m.condition_id) ? { ...m, condition_id: "" } : m)));
+    setPalette(p => p.filter(id => !ids.has(id)));
+    if (ids.has(activeCond)) setActiveCond(next[0]?.id || "");
+    setCommitMsg(`Deleted ${ids.size} condition(s).`);
   }
 
   // custom columns: project-scoped vocabulary editing + per-condition assignment.
@@ -10613,7 +10621,7 @@ export default function TakeoffCanvas() {
             and nothing important is ever past the right edge. paddingTop 16
             keeps the cluster captions (top:-13) inside the scroll box. */}
         <div data-topbar-scroll style={{ display: "flex", gap: 7, alignItems: "center", flex: "1 1 0", minWidth: 0, padding: "16px 0 0", overflowX: "auto", overflowY: "hidden", scrollbarWidth: "thin", overscrollBehaviorX: "contain" }}>
-        <strong style={{ display: "inline-flex", alignItems: "center", whiteSpace: "nowrap" }} title="OpenTakeoff"><OtLockup size={15} />{agentRunning && <ScanStar size={13} reach={1.6} working style={{ color: "var(--cobalt)", marginLeft: 8 }} title="The agent is working" />}</strong>
+        <strong style={{ display: "inline-flex", alignItems: "center", whiteSpace: "nowrap" }} title="CDB custom development"><CdbBrand size={15} />{agentRunning && <ScanStar size={13} reach={1.6} working style={{ color: "var(--cobalt)", marginLeft: 8 }} title="The agent is working" />}</strong>
         <button type="button" onClick={() => fileInputRef.current?.click()} title="Open plans — PDF, image, or a .zip plan set (or just drag them onto the canvas)"
           style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 10px", border: "1px solid var(--ink)", background: "var(--ink)", color: "var(--paper-bright)", cursor: "pointer", fontWeight: 600, fontSize: 12.5, lineHeight: 1 }}>
           <Icon name="plus" size={14} />Open</button>

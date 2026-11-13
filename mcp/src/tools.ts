@@ -33,6 +33,7 @@ import { exportEstimateFile, exportProposalFile } from "./estimateFiles.ts";
 import { assertWritable, OVERWRITE_DESC } from "./safewrite.ts";
 import { importTakeoff } from "./importing.ts";
 import { registerSuites } from "./suites.ts";
+import { registerLiveBrowserTools } from "./liveBrowser.ts";
 
 // The coordinate contract, stated on every tool so any agent reading any one
 // description knows the space it is working in.
@@ -79,6 +80,7 @@ export function registerTools(realServer: McpServer, session: Session, opts: { o
     },
     sendResourceListChanged: () => realServer.sendResourceListChanged(),
   };
+  registerLiveBrowserTools(server);
   // ── the Assistant window (assistantBridge.ts): talk to this AI from inside the OpenTakeoff canvas ──
   const bridge = new AssistantBridge(() => {
     const v = (realServer as unknown as { server?: { getClientVersion?: () => { name?: string; version?: string } | undefined } }).server?.getClientVersion?.();

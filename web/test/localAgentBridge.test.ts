@@ -27,7 +27,7 @@ test("local bridge authenticates callers, pins origin, and routes a canvas comma
   let handler: any;
   const server = createServer((req, res) => handler(req, res, () => { res.writeHead(404); res.end(); }));
   try {
-    localAgentBridge().configurePreviewServer({ httpServer: server, middlewares: { use: (fn: any) => { handler = fn; } } });
+    localAgentBridge().configurePreviewServer({ config: { preview: { host: '127.0.0.1', port: 5173, strictPort: true } }, httpServer: server, middlewares: { use: (fn: any) => { handler = fn; } } });
     await new Promise<void>(resolve => server.listen(0, "127.0.0.1", resolve));
     const address = server.address() as any;
     const base = `http://127.0.0.1:${address.port}/__agent/`;
@@ -43,6 +43,9 @@ test("local bridge authenticates callers, pins origin, and routes a canvas comma
     assert.equal((await post("call", { name: "list_sheets", args: {} })).status, 409);
     await post("poll", { client: "canvas-1" });
     assert.equal((await post("poll", { client: "canvas-2" })).status, 409);
+    assert.equal((await post("call", { name: "workspace_state", args: {} })).status, 409);
+    await new Promise(r => setTimeout(r, 5100));
+    await post("poll", { client: "canvas-1" });
     const resultPromise = post("call", { name: "list_sheets", args: {} });
     let command: any;
     for (let i = 0; i < 20 && !command; i++) {
@@ -53,6 +56,29 @@ test("local bridge authenticates callers, pins origin, and routes a canvas comma
     assert.equal((await (await post("poll", { client: "canvas-1" })).json()).command, null);
     await post("result", { client: "canvas-1", id: command.id, result: { sheets: ["A3.02"] } });
     assert.deepEqual(await (await resultPromise).json(), { sheets: ["A3.02"] });
+    const state = { workspace_id: 'canvas:local', revision: '1', project_name: '697', snapshot: { schema: 'opentakeoff.takeoff_canvas.v1', conditions: [{ id: 'c1', finish_tag: 'CPT-1' }], shapes: [] }, pending_proposals: [] };
+    const args = { expected_workspace_id: state.workspace_id, expected_revision: state.revision, expected_project_name: '697', conditions: state.snapshot.conditions };
+    const removal = post('call', { name: 'remove_unused_conditions', args });
+    const next = async () => {
+      for (let i = 0; i < 100; i++) {
+        const c = (await (await post('poll', { client: 'canvas-1' })).json()).command;
+        if (c) return c;
+        await new Promise(r => setTimeout(r, 5));
+      }
+      throw new Error('No command');
+    };
+    const read = await next(); assert.equal(read.name, 'workspace_state');
+    await post('result', { client: 'canvas-1', id: read.id, result: state });
+    const remove = await next(); assert.equal(remove.name, 'remove_unused_conditions');
+    // Backup exists BEFORE browser ever receives the write.
+    const fs = await import('node:fs');
+    const backupDir = join(home, '.local/state/opentakeoff/backups');
+    const names = fs.readdirSync(backupDir); assert.equal(names.length, 1);
+    assert.deepEqual(JSON.parse(readFileSync(join(backupDir, names[0]), 'utf8')), state.snapshot);
+    await post('result', { client: 'canvas-1', id: remove.id, result: { removed: args.conditions } });
+    const receipt = await (await removal).json();
+    assert.match(receipt.backup_sha256, /^[a-f0-9]{64}$/);
+    assert.deepEqual(receipt.removed, args.conditions);
   } finally {
     await new Promise<void>(resolve => server.close(() => resolve()));
     if (oldHome === undefined) delete process.env.HOME; else process.env.HOME = oldHome;

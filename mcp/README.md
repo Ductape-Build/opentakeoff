@@ -44,9 +44,9 @@ what's missing where rendering isn't available.
 engine is re-validated against a wider plan corpus: `tools/list` never names them, the
 initialize `instructions` say so and point at `measure_polygon`, and no other tool's
 description sends an agent to a verb that is not there. A default build registers
-**<!--tool-count-->62<!--/tool-count--> tools**. Everything else — sweeps, counts, `derive_base`, `derive_transitions`, the
+**<!--tool-count-->65<!--/tool-count--> tools**. Everything else — sweeps, counts, `derive_base`, `derive_transitions`, the
 exports — is unchanged. Set `OPENTAKEOFF_ONE_CLICK=1` in the server's environment to
-register both verbs (<!--tool-count-all-->64<!--/tool-count-all--> tools); the parity, conformance and e2e tests run that way, and
+register both verbs (<!--tool-count-all-->67<!--/tool-count-all--> tools); the parity, conformance and e2e tests run that way, and
 `test/gate.test.ts` pins both surfaces. The rows and examples below that use `one_click`
 describe the lifted build. Design note: [`docs/design/ONE_CLICK_GATE.md`](../docs/design/ONE_CLICK_GATE.md).
 
@@ -123,7 +123,7 @@ includes document text, shape vertices, or result payload content.
 
 ### Staged tool exposure (opt-in)
 
-By default every client gets all <!--tool-count-->62<!--/tool-count--> tool schemas on `tools/list`—the flat
+By default every client gets all <!--tool-count-->65<!--/tool-count--> tool schemas on `tools/list`—the flat
 contract every published client already expects. Fifty-two descriptions is real
 token weight for an agent session that may never touch half of them, so the
 server can instead stage the surface along the workflow it already teaches:
@@ -132,7 +132,7 @@ server can instead stage the surface along the workflow it already teaches:
 OPENTAKEOFF_MCP_STAGED_TOOLS=1 npx -y opentakeoff-mcp
 ```
 
-Staged, only the **setup** stage (load, scale, read the set—<!--tool-count-setup-->15<!--/tool-count-setup--> tools) starts
+Staged, only the **setup** stage (load, scale, read the set—<!--tool-count-setup-->18<!--/tool-count-setup--> tools) starts
 enabled, plus one opener: `open_tool_stage`. Calling it with `"measure"`,
 `"revise"`, or `"handoff"` enables that stage's tools and fires
 `tools/list_changed`, so any client that supports dynamic tool lists (Claude
@@ -149,6 +149,9 @@ The [generated tool index](../docs/MCP_TOOL_INDEX.md) lists stages and required 
 
 | Tool | What it does |
 |---|---|
+| `live_browser_status` | Check the authenticated local browser bridge; disconnected is never an offline-session fallback. Optional pinned `port` defaults to 5188. |
+| `live_browser_state` | Read the actual canvas identity, revision, source files, conditions, shapes and full takeoff snapshot. See [local bridge](../docs/LOCAL_AGENT.md). |
+| `live_remove_unused_conditions` | Explicit id/tag removal only with matching workspace/revision/project, zero shapes, no pending proposals and verified private disk backup before deletion. Never cascades or approves. Read live state afterward. |
 | `load_plan` | Open a plan PDF from disk. Default replaces the whole session; **`merge: true` ADDS the document to the working set** (#152)—plans + schedule + addenda as one takeoff, sheet graph spanning the whole set, marked set covering every worked sheet. Returns per-sheet dims, title-block `sheet_number`, and the detected drawn scale where present. |
 | `sheet_info` | One sheet's dims, vector segment count, scale status, detected suggestion, committed shape count. |
 | `set_scale` | Set a sheet's scale—exactly one of `label`, `upp`, `calibrate {p1, p2, feet}`, `use_detected`. **Lands unconfirmed** (`confirmed: false`) until a human confirms in the canvas—see Scale rules. |

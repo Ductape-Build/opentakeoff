@@ -38,6 +38,11 @@ export function OtWordmark({ size = 15, color = "var(--ink)", style }) {
 }
 
 // Mark + wordmark, the header lockup. `working` swaps nothing in; the agent's state shows on the scan star.
+export function CdbBrand({ size = 15, style }) {
+  return <span data-cdb-brand="cdb-development" title="CDB custom development"
+    style={{ fontFamily: "var(--f-body)", fontWeight: 800, fontSize: size, lineHeight: 1, letterSpacing: "0.04em", color: "var(--ink)", whiteSpace: "nowrap", ...style }}>CDB</span>;
+}
+
 export function OtLockup({ size = 15, style }) {
   return (
     <span className="ot-lockup" style={{ display: "inline-flex", alignItems: "center", gap: Math.round(size * 0.5), ...style }}>

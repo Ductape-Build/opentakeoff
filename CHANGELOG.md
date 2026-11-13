@@ -15,6 +15,8 @@ Click **Pin** beside **Sheets** in the top toolbar, then click two corners aroun
 
 ## Unreleased
 
+- **Ductape-Build fork: live-browser MCP cleanup.** Dedicated live status/state tools distinguish the canvas from the independent engine. Unused-condition removal requires exact workspace/revision/id-tag targets, zero shapes, no pending proposals and a verified private disk backup. The preview bridge supports pinned loopback ports (desktop 5188) and refuses multiple canvases. See `docs/LOCAL_AGENT.md`.
+
 - **Ductape-Build fork: bulk scale.** Scale → Apply scale to sheets scans all loaded PDF pages and applies a chosen scale to selected unscaled sheets. Select matching sheets excludes unknown, mixed and conflicting printed scales. Existing calibrations are never overwritten; closed sheets with dimensional work are protected. Open-sheet quantities are recalculated in one update. See `docs/BULK_SCALE.md`.
 
 - **Ductape-Build fork: live canvas agent control.** Opt-in authenticated loopback bridge exposes the existing browser agent tools to local agents; reads the open project directly and stages geometry through the existing human review gate. See `docs/LOCAL_AGENT.md`.

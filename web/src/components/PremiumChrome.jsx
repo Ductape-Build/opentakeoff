@@ -6,7 +6,7 @@
 
 import React from "react";
 import { Icon } from "../brand/icons.jsx";
-import { OtMark, ScanStar } from "../brand/marks.jsx";
+import { CdbBrand, ScanStar } from "../brand/marks.jsx";
 import { keyText } from "../lib/keys.ts";
 import ToolMenu from "./ToolMenu.jsx";
 import "./premiumChrome.css";
@@ -14,7 +14,7 @@ import "./premiumChrome.css";
 export function PremiumRail({ onSearch, onSheets, sheetsOpen, onOpenPlans, helpItems, onMenuDepth, onCollapse, onLayout, running }) {
   return (
     <nav className="pc-rail" aria-label="Workspace">
-      <span className="pc-rail-brand" title="OpenTakeoff">{running ? <ScanStar size={22} working reach={1.4} style={{ color: "var(--cobalt)" }} title="The agent is working" /> : <OtMark size={24} />}</span>
+      <span className="pc-rail-brand" title={running ? "CDB custom development — agent working" : "CDB custom development"}><CdbBrand size={15} /></span>
       <span className="pc-rail-sep" />
       <button type="button" className="pc-rail-btn" onClick={onSearch} title={`Find a tool, sheet, or action (${keyText("⌘K")})`} aria-label="Find an action"><Icon name="search" size={19} /></button>
       <button type="button" className="pc-rail-btn" aria-pressed={!!sheetsOpen} onClick={onSheets} title="Sheets" aria-label="Sheets"><Icon name="sheets" size={19} /></button>

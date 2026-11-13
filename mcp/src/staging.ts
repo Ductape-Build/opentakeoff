@@ -15,6 +15,7 @@ import { GATED_TOOLS } from "./gate.ts";
 export const TOOL_STAGES: Record<string, readonly string[]> = {
   // Always enabled: an agent needs these to orient before anything else is useful.
   setup: [
+    "live_browser_status", "live_browser_state", "live_remove_unused_conditions",
     "load_plan", "sheet_info", "set_scale", "sheet_graph", "resolve_tag",
     "find_schedule", "read_sheet_text", "find_text", "sheet_context", "get_sheet_vectors", "view_sheet",
     // the Assistant window is how a person reaches the agent from the canvas — open from the first call

@@ -1,7 +1,7 @@
 // Connect only when this local preview explicitly enables the bridge.
 // Executes the existing browser agent registry: proposals retain its human gate.
 export function startLocalAgentLink(execute) {
-  if (location.origin !== "http://127.0.0.1:5173") return () => {};
+  if (location.protocol !== "http:" || location.hostname !== "127.0.0.1") return () => {};
   const controller = new AbortController();
   let timer;
   const client = crypto.randomUUID();
