@@ -20,7 +20,7 @@ import { Z, S } from "../lib/ui.js";
 import { ScanStar } from "../brand/marks.jsx";
 import { keyLabel, keyText, isApplePlatform } from "../lib/keys.ts";
 
-const GUIDE_URL = "https://github.com/Kentucky-ai/opentakeoff/blob/main/docs/USER_GUIDE.md";
+const GUIDE_URL = "https://github.com/Ductape-Build/opentakeoff/blob/cdb-development/docs/USER_GUIDE.md";
 
 function Kbd({ children }) {
   return (

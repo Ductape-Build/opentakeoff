@@ -1,9 +1,10 @@
 {
-  "name": "opentakeoff-mcp",
+  "name": "cdb-opentakeoff-mcp",
+  "private": true,
   "version": "0.9.105",
-  "mcpName": "io.github.Kentucky-ai/opentakeoff",
+  "mcpName": "io.github.Ductape-Build/cdb-opentakeoff",
   "type": "module",
-  "description": "OpenTakeoff MCP server — drive the takeoff engine from your MCP client over stdio.",
+  "description": "CDB OpenTakeoff MCP — Ductape-Build downstream fork of Kentucky-ai/opentakeoff; local source build, not published on npm.",
   "license": "AGPL-3.0-only",
   "engines": {
     "node": ">=20"
@@ -20,7 +21,7 @@
     "check:wiki": "node scripts/check-wiki.mjs",
     "check:versions": "node ../scripts/check-version-consistency.mjs",
     "check:tool-count": "node --import tsx scripts/check-tool-count.mjs",
-    "test": "node --import tsx --test test/liveBrowser.test.ts test/arc.test.ts test/assistantBridge.test.ts test/checkers.test.ts test/conformance.test.ts test/constants.test.ts test/context.test.ts test/document.test.ts test/dxf.test.ts test/e2e.test.ts test/estimate.test.ts test/finishSchedule.test.ts test/gate.test.ts test/graphEvalRowsym.test.ts test/labels.test.ts test/mep.test.ts test/overlap.test.ts test/pageSpans.test.ts test/parity.test.ts test/proposals.test.ts test/raster.test.ts test/resources.test.ts test/safewrite.test.ts test/scalewarn.test.ts test/scheduleImport.test.ts test/scope.test.ts test/session.test.ts test/splittags.test.ts test/staging.test.ts test/suites.test.ts test/sweepguard.test.ts test/tools.test.ts test/transitions.test.ts test/twins.test.ts test/view.test.ts test/wiki.test.ts"
+    "test": "node --import tsx --test test/forkIdentity.test.ts test/liveBrowser.test.ts test/arc.test.ts test/assistantBridge.test.ts test/checkers.test.ts test/conformance.test.ts test/constants.test.ts test/context.test.ts test/document.test.ts test/dxf.test.ts test/e2e.test.ts test/estimate.test.ts test/finishSchedule.test.ts test/gate.test.ts test/graphEvalRowsym.test.ts test/labels.test.ts test/mep.test.ts test/overlap.test.ts test/pageSpans.test.ts test/parity.test.ts test/proposals.test.ts test/raster.test.ts test/resources.test.ts test/safewrite.test.ts test/scalewarn.test.ts test/scheduleImport.test.ts test/scope.test.ts test/session.test.ts test/splittags.test.ts test/staging.test.ts test/suites.test.ts test/sweepguard.test.ts test/tools.test.ts test/transitions.test.ts test/twins.test.ts test/view.test.ts test/wiki.test.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
@@ -44,7 +45,7 @@
     "typescript": "^5.7.2"
   },
   "bin": {
-    "opentakeoff-mcp": "dist/server.js"
+    "cdb-opentakeoff-mcp": "dist/server.js"
   },
   "main": "dist/server.js",
   "files": [
@@ -53,10 +54,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Kentucky-ai/opentakeoff.git",
+    "url": "git+https://github.com/Ductape-Build/opentakeoff.git",
     "directory": "mcp"
   },
-  "homepage": "https://github.com/Kentucky-ai/opentakeoff/tree/main/mcp",
+  "homepage": "https://github.com/Ductape-Build/opentakeoff/tree/cdb-development/mcp",
   "keywords": [
     "mcp",
     "model-context-protocol",

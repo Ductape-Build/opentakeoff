@@ -1,4 +1,10 @@
-# Working on the repository
+# Working on the CDB fork
+
+**Fork context overrides inherited upstream shipping instructions below.** This is [Ductape-Build/opentakeoff](https://github.com/Ductape-Build/opentakeoff), branch `cdb-development`, not the canonical Kentucky AI repository. Work on that branch when explicitly requested; preserve concurrent edits. No fork production host is declared. Upstream merge/deploy rules and historical release details below describe upstream, not this checkout. Follow the same evidence and test gates before committing.
+
+Build and connect using [CDB setup](../CDB_SECOND_MACHINE.md). The private `cdb-opentakeoff-mcp` package is source-only; `mcp/server.json` and the public discovery copy are local descriptors, not valid MCP Registry publication manifests (`registryType: local` is deliberate). All seven MCP version fields still agree; no version bump is implied by fork naming. npm publishing is blocked by `private: true`; the inherited publish workflow is restricted to `Kentucky-ai/opentakeoff`. CDB publication would require a separate explicit release design.
+
+Keep CDB visible in every workspace layout, blank startup defaults and the live/offline boundary. Preserve upstream legal attribution and wire/schema/storage identifiers; do not bulk-rebrand history or migrate saved projects.
 
 OpenTakeoff is a **client-only React app**: a PDF construction-takeoff canvas for flooring (useful for any trade). No backend, no database, no auth—everything runs and persists in the browser. AGPL-3.0-only. (For the one-page project pitch and vision, see [`AGENT_BRIEF.md`](../../AGENT_BRIEF.md); for capability → code mapping, see [`FEATURES.md`](../../FEATURES.md).)
 
@@ -32,7 +38,7 @@ an `mcp-v*` tag. The old line here said "Netlify never builds anything
 itself", which is now exactly backwards—Netlify is the only thing that
 builds production. **Merge = deploy either way: that part has never changed.**
 
-> **This is the canonical `Kentucky-ai/opentakeoff` repo—production is
+> **Upstream context only: the canonical `Kentucky-ai/opentakeoff` repo—production is
 > <https://opentakeoff.kentucky-ai.com>, nothing else.** A downstream fork
 > (`knmurphy/opentakeoff`) tracks this repo as its own upstream and deploys
 > separately to `takeoff.345flooring.com`—that URL belongs to *that* fork,

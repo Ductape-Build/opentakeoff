@@ -1,4 +1,4 @@
-// Check published MCP metadata and the independently versioned web package.
+// Check MCP source/distribution metadata and the independently versioned web package.
 // This checker is intentionally read-only: --write never repairs agreement
 // because a release version is an explicit maintainer decision.
 import { readFileSync } from "node:fs";
@@ -36,7 +36,7 @@ function checkAgreement(group, label) {
   return true;
 }
 
-const ok = checkAgreement(fields, "MCP published") && checkAgreement(webFields, "web package");
+const ok = checkAgreement(fields, "MCP source/distribution") && checkAgreement(webFields, "web package");
 if (!ok) {
   if (process.argv.includes("--write")) console.error("--write is refused for version mismatches; update each named release field explicitly.");
   throw new Error("version agreement check failed");

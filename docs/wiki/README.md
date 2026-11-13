@@ -1,4 +1,6 @@
-# OpenTakeoff knowledge index
+# CDB OpenTakeoff knowledge index
+
+Ductape-Build downstream app and MCP fork of Kentucky-ai/opentakeoff. Use the [CDB setup guide](../CDB_SECOND_MACHINE.md), not upstream npm installation. Normal tools operate the independent offline session; only explicit live-browser tools target a connected canvas. Upstream formats and `takeoff://` identifiers remain compatible.
 
 Read the page that answers the current question. Agents can read this index at
 `takeoff://wiki` and individual pages at `takeoff://wiki/{page}` without loading

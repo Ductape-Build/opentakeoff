@@ -1,124 +1,63 @@
-# Connect OpenTakeoff to your AI
+# Connect CDB OpenTakeoff to your AI
 
-OpenTakeoff's MCP server, [`opentakeoff-mcp`](https://www.npmjs.com/package/opentakeoff-mcp),
-gives an AI agent the real takeoff engine: load a plan set, set the scale, measure rooms,
-derive base and transitions, and export the marked set. This page gets it into the app you
-already use, then runs a first takeoff command on a real plan.
+CDB is Ductape-Build's downstream app and MCP fork of [Kentucky-ai/opentakeoff](https://github.com/Kentucky-ai/opentakeoff). The private `cdb-opentakeoff-mcp` package is **local-source-only**, not the upstream npm release. Use Node 24 for the full checkout and follow [CDB build/setup](CDB_SECOND_MACHINE.md).
 
-It runs **on your own computer**. The agent reads plan files from your disk and writes exports
-back to it. Nothing is hosted, and there is no account to create.
-
-| Your app | How | Needs |
-|---|---|---|
-| **Claude Code** (terminal) | one command | Node 20+ |
-| **Codex CLI** (terminal) | one command | Node 20+ |
-| **Cursor** and other MCP clients | a few lines of JSON | Node 20+ |
-| **Claude Desktop** | download one file, double-click | nothing else |
-| **claude.ai in a browser, the Claude mobile app, ChatGPT** | not supported yet ([why](#claudeai-the-claude-mobile-app-and-chatgpt)) | — |
-
-Check your Node version with `node -v`. The terminal routes need 20 or newer; get it from
-[nodejs.org](https://nodejs.org).
+Normal measurement tools operate an independent offline engine session, **not this canvas**. Only explicit live-browser tools target the opt-in connected project; verify status and workspace identity before mutation. Assistant chat pairing does not change this boundary.
 
 ## Claude Code
 
-```bash
-claude mcp add --scope user opentakeoff -- npx -y opentakeoff-mcp
-```
+Build first, then replace the absolute path below:
 
-`--scope user` makes OpenTakeoff available in every folder. Leave it off to add it to the
-current project only. Check it:
-
-```bash
+```sh
+claude mcp add --scope user cdb-opentakeoff -- node /ABSOLUTE/PATH/TO/opentakeoff/mcp/dist/server.js
 claude mcp list
 ```
 
-```
-opentakeoff: npx -y opentakeoff-mcp - ✔ Connected
-```
+The server must initialize as `cdb-opentakeoff-mcp`, title **CDB OpenTakeoff (Ductape-Build fork)**. Remove an old upstream registration if it would create duplicates. `--scope user` makes it available in every folder.
 
 ## Codex CLI
 
-```bash
-codex mcp add opentakeoff -- npx -y opentakeoff-mcp
+```sh
+codex mcp add cdb-opentakeoff -- node /ABSOLUTE/PATH/TO/opentakeoff/mcp/dist/server.js
 codex mcp list
 ```
 
-Codex asks before running OpenTakeoff's tools; approve them as they come up.
-
 ## Cursor and other MCP clients
 
-Any client that runs local ("stdio") MCP servers takes the same entry. In Cursor it goes in
-`~/.cursor/mcp.json` (every project) or `.cursor/mcp.json` (one project):
+Checked-in `.mcp.json` and `.cursor/mcp.json` use `node mcp/dist/server.js`; launch the client from the repository root. VS Code uses `${workspaceFolder}/mcp/dist/server.js`; open this repo as that folder. Build first. For global registrations or clients launched elsewhere, use an absolute path:
 
 ```json
 {
   "mcpServers": {
-    "opentakeoff": {
-      "command": "npx",
-      "args": ["-y", "opentakeoff-mcp"]
+    "cdb-opentakeoff": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/TO/opentakeoff/mcp/dist/server.js"]
     }
   }
 }
 ```
 
+Node must be on the client PATH; otherwise use an absolute Node executable too. No download fallback is provided.
+
 ## Claude Desktop
 
-1. Download **[opentakeoff-mcp.mcpb](https://github.com/Kentucky-ai/opentakeoff/releases/latest/download/opentakeoff-mcp.mcpb)**
-   (this link always points at the newest release).
-2. Double-click it. Claude Desktop opens an install prompt; confirm it.
-
-The bundle carries its own dependencies, so no Node or npm install is needed. It leaves out
-the optional native renderer on purpose: every measuring and export tool works, but
-`view_sheet` cannot draw sheet images and says so when asked.
+Use the same local stdio JSON in Desktop settings after building. No CDB npm or MCPB release is published; upstream download bundles are not this fork.
 
 ## claude.ai, the Claude mobile app, and ChatGPT
 
-These apps run in Anthropic's and OpenAI's clouds, not on your computer. They can only reach
-an MCP server at a public web address, and a server on the internet has to keep strangers
-out and must not read files off the machine it runs on. OpenTakeoff doesn't ship that server
-yet. Until it does, use Claude Desktop or a terminal agent above.
+Cloud apps cannot reach this local stdio server. No public hosted CDB MCP endpoint is provided; do not expose the local browser bridge to the network.
 
 ## Try it on a real plan
 
-The repository's demo plan is a real public floor finish plan (VA St. Cloud, sheet AF101,
-with its finish schedule on AF600). Download it into a folder:
-
-```bash
-curl -LO https://github.com/Kentucky-ai/opentakeoff/raw/main/demo/sample-finish-plan.pdf
-```
-
-Start your agent in that folder and ask:
-
-> Using OpenTakeoff, load sample-finish-plan.pdf and tell me how many sheets it has, each
-> sheet's number, and the detected scale.
-
-You should get two sheets: **AF101** at **1/8" = 1'-0"** and **AF600** with no scale found.
-A detected scale is not yet a set scale; setting it is the first step of every takeoff. From there, the [agent manual](AGENT_GUIDE.md) is how a full takeoff
-runs, and [MCP.md](MCP.md) walks the whole tool surface.
+The bundled `demo/sample-finish-plan.pdf` is the public VA St. Cloud finish plan, with AF101 and its schedule AF600. Ask the connected CDB agent to load its absolute path, list sheets and read detected scale. Expect AF101 at **1/8" = 1'-0"** and AF600 with no scale found. A detected scale is not an adopted scale; explicitly set each measured sheet's scale. Follow the [agent manual](AGENT_GUIDE.md) and [MCP guide](MCP.md) through overlay review and marked-PDF export. This example loads the independent engine, not the live browser.
 
 ## Talk to your AI from inside the canvas (Assistant window)
 
-Once OpenTakeoff is connected to your AI app, you can talk to that same AI from the canvas's **Assistant** window (right edge of the canvas, or **Help → Assistant**). No API key: the model runs in the app you already use, on your own plan.
-
-1. In your AI app, say: **Open the OpenTakeoff assistant**. It calls `assistant_open` and gives you a link and a 6-character code.
-2. Open the link (it pairs the window automatically), or type the code into the Assistant window.
-3. Type in the window. Your AI answers there, every tool it calls shows up as it works, and the window says which AI is answering (for example, "Powered by Claude Code").
-
-After 10 quiet minutes your AI stops listening, so an idle window doesn't use up your plan. Say **listen** in your AI app to bring it back.
-
-The link is private to your computer: the MCP server listens only on `127.0.0.1` (ports 47615–47619), accepts only the OpenTakeoff app's own web address, and needs the one-time code before it carries a single message. It needs the `opentakeoff-mcp` release that adds the `assistant_*` tools (the first after 0.9.103).
+Ask your connected agent to call `assistant_open`, then use its link/code in the canvas Assistant window. The chat bridge is distinct from the live canvas measurement bridge. If it refuses the local app origin, report that limitation; do not bypass origin/authentication checks. Assistant messaging does not make ordinary MCP measurements target the browser. The guarded live tools are documented in [LOCAL_AGENT.md](LOCAL_AGENT.md).
 
 ## Good to know
 
-- **Where your plans go.** The server reads and writes files on your computer only. What
-  the agent reads back (text, quantities and, where rendering is available, sheet images)
-  becomes part of your conversation with your AI provider, like anything else you share
-  with it.
-- **Updates.** `npx -y opentakeoff-mcp` runs the package from npm. To make sure you're on
-  the newest release, use `opentakeoff-mcp@latest` in the command; to pin one, use a
-  version, e.g. `opentakeoff-mcp@0.9.90`.
-- **Staged tools.** Some clients cope better with a smaller tool list. Set
-  `OPENTAKEOFF_MCP_STAGED_TOOLS=1` in the server's environment to start with the setup tools
-  only; details in [`mcp/README.md`](../mcp/README.md#staged-tool-exposure-opt-in).
-- **Building from source or running in Docker:** [`MCP.md`](MCP.md#setup) and
-  [`mcp/README.md`](../mcp/README.md).
+- **Privacy:** the server reads/writes local files; text, quantities and images returned to your agent become part of your AI-provider conversation.
+- **Updates:** inspect branch/status, preserve local changes, intentionally pull `cdb-development`, rebuild and reconnect. npm updates fetch upstream, not CDB.
+- **Staged tools:** `OPENTAKEOFF_MCP_STAGED_TOOLS=1` starts with setup tools; see [staged exposure](../mcp/README.md#staged-tool-exposure-opt-in).
+- **Source and Docker:** see [MCP setup](MCP.md#setup) and the [server reference](../mcp/README.md).

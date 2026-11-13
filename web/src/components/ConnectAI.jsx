@@ -13,16 +13,15 @@ import { ScanStar } from "../brand/marks.jsx";
 import { inOtherModal, otherModalOpen } from "../lib/modalKeys";
 import { samplePlanUrl, SAMPLE_PLAN_NAME } from "../lib/samplePlan.js";
 
-const CONNECT_URL = "https://github.com/Kentucky-ai/opentakeoff/blob/main/docs/CONNECT.md";
-const AGENT_GUIDE_URL = "https://github.com/Kentucky-ai/opentakeoff/blob/main/docs/AGENT_GUIDE.md";
-const MCPB_URL = "https://github.com/Kentucky-ai/opentakeoff/releases/latest/download/opentakeoff-mcp.mcpb";
+const CONNECT_URL = "https://github.com/Ductape-Build/opentakeoff/blob/cdb-development/docs/CDB_SECOND_MACHINE.md";
+const AGENT_GUIDE_URL = "https://github.com/Ductape-Build/opentakeoff/blob/cdb-development/docs/AGENT_GUIDE.md";
 const NODE_URL = "https://nodejs.org";
 
 const MCP_JSON = `{
   "mcpServers": {
-    "opentakeoff": {
-      "command": "npx",
-      "args": ["-y", "opentakeoff-mcp"]
+    "cdb-opentakeoff": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/TO/opentakeoff/mcp/dist/server.js"]
     }
   }
 }`;
@@ -51,12 +50,11 @@ const A = ({ href, children }) => <a href={href} target="_blank" rel="noreferrer
 
 const TABS = [
   {
-    id: "desktop", label: "Claude Desktop", needs: "Nothing else to install",
+    id: "desktop", label: "Claude Desktop", needs: "Local CDB source build required",
     body: () => (
       <>
-        <P>1. Download <A href={MCPB_URL}>opentakeoff-mcp.mcpb</A> — the link always points at the newest release.</P>
-        <P>2. Double-click it. Claude Desktop opens an install prompt; confirm it.</P>
-        <P>The bundle carries its own dependencies, so there's no Node or npm to install. It leaves out the optional sheet renderer: every measuring and export tool works, but the agent can't draw sheet images.</P>
+        <P>Build the CDB fork using <A href={CONNECT_URL}>the local setup guide</A>, then register its built server in Claude Desktop settings. Replace the absolute path below; there is no published CDB npm package or download bundle.</P>
+        <Code label="MCP config" text={MCP_JSON} />
       </>
     ),
   },
@@ -64,9 +62,9 @@ const TABS = [
     id: "claude-code", label: "Claude Code", node: true,
     body: () => (
       <>
-        <P>Run this once in any terminal:</P>
-        <Code label="Claude Code command" text="claude mcp add --scope user opentakeoff -- npx -y opentakeoff-mcp" />
-        <P>Check it — you should see <code>opentakeoff: npx -y opentakeoff-mcp - ✔ Connected</code>:</P>
+        <P>Build the fork first, replace the absolute path, then run:</P>
+        <Code label="Claude Code command" text="claude mcp add --scope user cdb-opentakeoff -- node /ABSOLUTE/PATH/TO/opentakeoff/mcp/dist/server.js" />
+        <P>Check that the connected server identifies itself as <code>cdb-opentakeoff-mcp</code>, not the upstream server:</P>
         <Code label="check command" text="claude mcp list" />
       </>
     ),
@@ -75,7 +73,7 @@ const TABS = [
     id: "codex", label: "Codex CLI", node: true,
     body: () => (
       <>
-        <Code label="Codex command" text={"codex mcp add opentakeoff -- npx -y opentakeoff-mcp\ncodex mcp list"} />
+        <Code label="Codex command" text={"codex mcp add cdb-opentakeoff -- node /ABSOLUTE/PATH/TO/opentakeoff/mcp/dist/server.js\ncodex mcp list"} />
         <P>Codex asks before it runs OpenTakeoff's tools; approve them as they come up.</P>
       </>
     ),
@@ -130,7 +128,7 @@ export default function ConnectAI({ onClose }) {
             style={{ background: "none", border: "none", color: "var(--ink-soft)", fontSize: 18, cursor: "pointer", lineHeight: 1, padding: 4 }}>×</button>
         </div>
         <P>
-          Give an AI agent the same takeoff engine this canvas runs: load a plan set, set the scale, measure rooms, export the marked set.
+          CDB OpenTakeoff is the Ductape-Build fork of Kentucky-ai/opentakeoff. Build its MCP locally; the upstream npm package does not include CDB changes. Normal measurement tools use a separate offline engine session. Only the explicit live-browser tools target the opt-in connected canvas.
           It runs on your own computer — the agent reads plans from your disk, nothing is hosted, no account.
         </P>
 
@@ -144,7 +142,7 @@ export default function ConnectAI({ onClose }) {
         </div>
         <div role="tabpanel" aria-label={cur.label}>
           <div style={{ marginBottom: 8, fontSize: 12, color: "var(--ink-muted)" }}>
-            {cur.node ? <>Needs <A href={NODE_URL}>Node 20+</A> — check with <code>node -v</code></> : cur.needs}
+            {cur.node ? <>Needs <A href={NODE_URL}>Node 24+</A> — check with <code>node -v</code></> : cur.needs}
           </div>
           {cur.body()}
         </div>

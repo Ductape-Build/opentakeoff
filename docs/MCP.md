@@ -1,4 +1,6 @@
-# Driving OpenTakeoff from an AI agent (MCP)
+# Driving CDB OpenTakeoff from an AI agent (MCP)
+
+This is the Ductape-Build downstream fork of Kentucky-ai/opentakeoff. Build the private `cdb-opentakeoff-mcp` locally; no npm release is published. See [CDB setup](CDB_SECOND_MACHINE.md). Normal tools operate the independent offline session, not the canvas; use explicit [live-browser tools](LOCAL_AGENT.md) only after verifying project identity.
 
 OpenTakeoff ships an [MCP](https://modelcontextprotocol.io) server—[`mcp/`](../mcp/README.md)—that
 puts the real takeoff engine on stdio for your MCP client. Not a wrapper around the UI: the server imports shared
@@ -24,8 +26,9 @@ This is the from-source setup for working on the server. To just use it from Cla
 Codex, Cursor or Claude Desktop, follow [`CONNECT.md`](CONNECT.md) instead.
 
 ```bash
-cd web && npm install        # the engine's pdf.js lives here
-cd ../mcp && npm install
+npm ci --prefix web
+npm ci --prefix mcp
+npm run build --prefix mcp
 ```
 
 Register the server with your MCP client (any stdio client):
@@ -33,16 +36,16 @@ Register the server with your MCP client (any stdio client):
 ```json
 {
   "mcpServers": {
-    "opentakeoff": {
+    "cdb-opentakeoff": {
       "command": "node",
-      "args": ["--import", "tsx", "/absolute/path/to/opentakeoff/mcp/server.ts"]
+      "args": ["/absolute/path/to/opentakeoff/mcp/dist/server.js"]
     }
   }
 }
 ```
 
 Never point a client config at `npm start`—npm's banner goes to stdout,
-which is the MCP wire. `node --import tsx` is the whole invocation.
+which is the MCP wire. Run `node` directly against the built server.
 
 By default the server hands every client every tool schema at once. Set
 `OPENTAKEOFF_MCP_STAGED_TOOLS=1` in the server's environment to stage the

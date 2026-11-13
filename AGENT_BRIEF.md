@@ -1,4 +1,6 @@
-# OpenTakeoff — Agent Brief
+# CDB OpenTakeoff — Agent Brief
+
+Ductape-Build downstream fork of Kentucky-ai/opentakeoff, maintained on `cdb-development`. Use [CDB setup](docs/CDB_SECOND_MACHINE.md); the private local MCP is not an npm release. Normal engine tools do not operate the live canvas. See [local bridge](docs/LOCAL_AGENT.md) for explicit live tools.
 
 Start at the [knowledge index](docs/wiki/README.md), also exposed as
 `takeoff://wiki` to MCP clients. Read the page for the current task.
@@ -11,7 +13,7 @@ For the draft persisted-record contract and known compatibility gaps, read
 [`docs/TAKEOFF_PROTOCOL.md`](docs/TAKEOFF_PROTOCOL.md). The draft changes no current
 tool behavior or saved-file format.
 
-**Repo:** <https://github.com/Kentucky-ai/opentakeoff> · **Live:**
+**Upstream repo:** <https://github.com/Kentucky-ai/opentakeoff> · **Upstream live (not CDB):**
 <https://opentakeoff.kentucky-ai.com> · **License:** AGPL-3.0-only
 
 ---
@@ -22,7 +24,7 @@ A takeoff is the act of measuring quantities off a construction drawing—how mu
 much wall, how many fixtures, at what scale, on which sheet. OpenTakeoff is an open-source
 engine for doing that, with a browser canvas and an MCP server sharing geometry and quantity modules:
 
-- **A stdio MCP server** (`npx -y opentakeoff-mcp`)—<!--tool-count-->65<!--/tool-count--> tools plus browsable sheet and wiki resources (One-Click's two verbs are temporarily gated and not registered; see `docs/design/ONE_CLICK_GATE.md`).
+- **A stdio MCP server** (`node mcp/dist/server.js` from this checkout's root)—<!--tool-count-->65<!--/tool-count--> tools plus browsable sheet and wiki resources (One-Click's two verbs are temporarily gated and not registered; see `docs/design/ONE_CLICK_GATE.md`).
   An agent opens a plan, reads the title block, sets the scale, measures source-backed boundaries, checks its own
   work on a rendered overlay, and hands back a marked-up planset.
 - **A browser canvas**—client-only React. An estimator drags in a plan set and traces it. No

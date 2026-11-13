@@ -30,6 +30,16 @@ const connect = async (staged: boolean) => {
 const toolNames = async (client: Client) =>
   new Set((await client.listTools()).tools.map((t) => t.name));
 
+test("CDB fork identifies itself at initialize without changing tool names", async () => {
+  const client = await connect(false);
+  try {
+    assert.equal(client.getServerVersion()?.name, "cdb-opentakeoff-mcp");
+    assert.equal(client.getServerVersion()?.title, "CDB OpenTakeoff (Ductape-Build fork)");
+    assert.match(client.getInstructions() || "", /Ductape-Build.*fork.*Kentucky-ai\/opentakeoff/);
+    assert.match(client.getInstructions() || "", /independent offline MCP session/);
+  } finally { await client.close(); }
+});
+
 test("staging: default build is the flat TOOL_NAMES — no opener, nothing disabled", async () => {
   const names = await toolNames(await connect(false));
   assert.equal(names.size, TOOL_NAMES.length);

@@ -1,42 +1,36 @@
-# OpenTakeoff MCP server
+# CDB OpenTakeoff MCP server
 
-Listed in the [official MCP registry](https://registry.modelcontextprotocol.io) as
-`io.github.Kentucky-ai/opentakeoff`, on [Glama](https://glama.ai/mcp/servers/Kentucky-ai/opentakeoff),
-and on [Smithery](https://smithery.ai/servers/Kentucky-ai/opentakeoff).
+**Ductape-Build downstream fork of [Kentucky-ai/opentakeoff](https://github.com/Kentucky-ai/opentakeoff)**, not the official npm package or MCP Registry listing. Package/initialize name: `cdb-opentakeoff-mcp`. Source-only and private; no CDB npm or MCPB release is published. Upstream AGPL and copyright attribution remain intact.
 
-**This page is the reference—every tool, every rule, every limit.** For *how to run a
-takeoff well* with it—the operating model, the standard finish, what the engine withholds
-and why, and the move that answers each refusal—read
-[`docs/AGENT_GUIDE.md`](../docs/AGENT_GUIDE.md) first. It's short, and it's the half that
-decides whether the numbers are any good.
+## Build and connect the local fork
 
-## Run it in 60 seconds (npx)
+From the repository root, with Node 24:
 
-No clone, no build—point your MCP client at the published package:
+```sh
+npm ci --prefix web
+npm ci --prefix mcp
+npm run build --prefix mcp
+npm run smoke:dist --prefix mcp
+```
+
+Project configs run this built fork: `.mcp.json` and `.cursor/mcp.json` require the repository root as the client working directory; VS Code uses `${workspaceFolder}/mcp/dist/server.js`. For global registrations or other working directories, replace the absolute path:
 
 ```json
 {
   "mcpServers": {
-    "opentakeoff": {
-      "command": "npx",
-      "args": ["-y", "opentakeoff-mcp"]
+    "cdb-opentakeoff": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/TO/opentakeoff/mcp/dist/server.js"]
     }
   }
 }
 ```
 
-Works with Claude Code (`claude mcp add opentakeoff -- npx -y opentakeoff-mcp`), Claude Desktop, Cursor, or any stdio MCP client. Node 20+.
+Node must be on the client PATH (or use an absolute Node executable). See [CDB setup](../docs/CDB_SECOND_MACHINE.md) and [connect guide](../docs/CONNECT.md). Remove an old upstream registration to avoid ambiguous duplicate servers.
 
-## One-click install (Claude Desktop)
+Normal measurement tools operate an **independent offline session**, not the browser canvas. For a live project, explicitly use `live_browser_status`, then `live_browser_state`, and verify identity before the guarded `live_remove_unused_conditions`. See [local bridge contract](../docs/LOCAL_AGENT.md).
 
-No Node, no npm: download **`opentakeoff-mcp.mcpb`** from the
-[latest release](https://github.com/Kentucky-ai/opentakeoff/releases) and
-double-click it—Claude Desktop installs the server with its dependencies
-bundled. Built by `npm run mcpb` and attached automatically to every `mcp-v*`
-release. The bundle is platform-neutral on purpose: it excludes the optional
-native canvas, so every JSON tool and the text/metadata resources work
-everywhere; the sheet-image resource and the `view_sheet` tool say exactly
-what's missing where rendering isn't available.
+This page is the tool reference; read the [agent manual](../docs/AGENT_GUIDE.md) for takeoff discipline. `takeoff://` resource URIs, protocol/schema IDs, saved formats and environment/storage keys intentionally remain upstream-compatible. `server.json` and the public discovery copy are local descriptors, not registry-schema publication manifests. The inherited publish workflow is upstream-only; CDB publication requires a separate explicit release design.
 
 ## One-Click is temporarily gated
 
@@ -85,9 +79,10 @@ Both `web/` and `mcp/` need their dependencies (the engine's pdf.js lives in
 `web/node_modules`):
 
 ```bash
-cd web && npm install
-cd ../mcp && npm install
-node --import tsx server.ts        # speaks MCP on stdio
+npm ci --prefix web
+npm ci --prefix mcp
+npm run build --prefix mcp
+node mcp/dist/server.js            # speaks MCP on stdio (repository root)
 ```
 
 Then register it with your MCP client (any stdio MCP client works):
@@ -95,9 +90,9 @@ Then register it with your MCP client (any stdio MCP client works):
 ```json
 {
   "mcpServers": {
-    "opentakeoff": {
+    "cdb-opentakeoff": {
       "command": "node",
-      "args": ["--import", "tsx", "/absolute/path/to/opentakeoff/mcp/server.ts"]
+      "args": ["/absolute/path/to/opentakeoff/mcp/dist/server.js"]
     }
   }
 }
@@ -108,8 +103,7 @@ config**: npm prints its banner to stdout, and stdout is the MCP wire. (Same
 reason the server redirects `console.log` to stderr before pdf.js loads—see
 `src/hush.ts`.)
 
-`tsx` is a runtime dependency, not a build tool: the engine is imported
-straight from `web/src/lib` as TypeScript, so plain `node` can't run it.
+For source development only, `cd mcp && node --import tsx server.ts` uses the development dependency `tsx`. Normal clients use the bundled `dist/server.js` with plain Node.
 
 For tool-call debugging, opt into structured stderr tracing:
 

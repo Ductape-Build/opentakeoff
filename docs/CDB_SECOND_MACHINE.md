@@ -60,7 +60,7 @@ Configure a **local stdio MCP** using an absolute Node executable and the freshl
 ```json
 {
   "mcpServers": {
-    "opentakeoff": {
+    "cdb-opentakeoff": {
       "command": "/ABSOLUTE/PATH/TO/node",
       "args": ["/ABSOLUTE/HOME/.local/share/opentakeoff/mcp/dist/server.js"]
     }
@@ -70,7 +70,9 @@ Configure a **local stdio MCP** using an absolute Node executable and the freshl
 
 Replace both paths on the target machine. For Hermes use its supported MCP configuration/installation workflow; do not hand-edit its config file. Configure other agents deliberately; one agent's registration does not automatically configure all agents.
 
-**Important:** checked-in `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json` are inherited upstream configurations using `npx -y opentakeoff-mcp`. That downloads the public package, not this fork. Override them in the intended client with the local built server above; do not assume those defaults provide the CDB live tools.
+**Checked-in project configs now run this fork:** `.mcp.json` and `.cursor/mcp.json` use `node mcp/dist/server.js`; launch the client with the **repository root as its working directory**. VS Code uses `${workspaceFolder}/mcp/dist/server.js`; open this repository as the workspace folder. Build first; there is intentionally no download fallback. If a client does not preserve that working directory, use the absolute-path registration above. Node must be on the client PATH, or use an absolute Node executable. Remove or disable an old upstream/global registration to avoid duplicate servers.
+
+The package and initialize name are **`cdb-opentakeoff-mcp`**, with title **CDB OpenTakeoff (Ductape-Build fork)**. The version tracks the inherited engine baseline; naming does not imply npm publication. The package is private; discovery descriptors are local-only, not MCP Registry manifests. The inherited publish workflow cannot run in Ductape-Build. Keep upstream attribution and all wire/schema/resource/storage identifiers unchanged.
 
 An optional executable wrapper can live at `~/.local/bin/opentakeoff-mcp` and exec the target machine's Node plus the same `mcp/dist/server.js`. The optional CLI helper is tracked at `scripts/opentakeoff-agent`; copy it to `~/.local/bin/opentakeoff-agent` with executable permissions or run it with Python directly.
 

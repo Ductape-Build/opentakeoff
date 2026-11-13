@@ -20,7 +20,7 @@
 // (bypassing `mcpb validate`, which would reject it) — publish it by hand:
 //
 //   node scripts/build-smithery-mcpb.mjs
-//   smithery mcp publish dist-smithery/opentakeoff-mcp.mcpb -n Kentucky-ai/opentakeoff
+//   CDB is source-only: do not publish this fork under the upstream Smithery identity.
 //
 // Re-run after any tool signature changes so the Smithery listing doesn't go
 // stale. Revisit/delete this script if smithery-ai/cli#787 ever ships a fix
@@ -110,14 +110,14 @@ cpSync(resolve(packageDir, 'README.md'), resolve(staging, 'README.md'))
 writeFileSync(resolve(staging, 'manifest.json'), JSON.stringify({
   manifest_version: '0.2',
   name: pkg.name,
-  display_name: 'OpenTakeoff',
+  display_name: 'CDB OpenTakeoff (Ductape-Build fork)',
   version: pkg.version,
   description: pkg.description,
   long_description: 'Construction takeoff for AI agents: load plan PDFs, browse the sheet set as resources, set and verify drawing scale, one-click room areas, measure, and export takeoff quantities with provenance. The same measuring engine as the OpenTakeoff web app.',
-  author: { name: 'Kentucky AI', url: 'https://github.com/Kentucky-ai' },
-  repository: { type: 'git', url: 'https://github.com/Kentucky-ai/opentakeoff' },
-  homepage: 'https://opentakeoff.kentucky-ai.com',
-  documentation: 'https://github.com/Kentucky-ai/opentakeoff/blob/main/mcp/README.md',
+  author: { name: 'Ductape-Build (fork; upstream Kentucky AI)', url: 'https://github.com/Ductape-Build' },
+  repository: { type: 'git', url: 'https://github.com/Ductape-Build/opentakeoff' },
+  homepage: pkg.homepage,
+  documentation: pkg.homepage,
   license: pkg.license,
   keywords: ['construction', 'takeoff', 'estimating', 'blueprints', 'measurement'],
   // Non-spec: real inputSchema per tool, required by Smithery's registry,
@@ -139,4 +139,4 @@ const bundlePath = resolve(outDir, `${pkg.name}.mcpb`)
 run('zip', ['-q', '-r', '-X', bundlePath, 'manifest.json', 'package.json', 'README.md', 'dist', 'node_modules'], staging)
 
 console.log(`\nbuilt ${bundlePath}`)
-console.log(`publish: smithery mcp publish ${bundlePath} -n Kentucky-ai/opentakeoff`)
+console.log("CDB local bundle only; no registry publication configured.")

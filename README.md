@@ -1,9 +1,19 @@
+# CDB OpenTakeoff — Ductape-Build fork
+
+**This repository is the downstream CDB app and MCP fork**, maintained on `cdb-development` at [Ductape-Build/opentakeoff](https://github.com/Ductape-Build/opentakeoff). It is not the official Kentucky AI app, npm package, or MCP Registry listing. Upstream: [Kentucky-ai/opentakeoff](https://github.com/Kentucky-ai/opentakeoff).
+
+Use the [CDB build and second-machine guide](docs/CDB_SECOND_MACHINE.md). The MCP is a **local source build**, named `cdb-opentakeoff-mcp` and marked private; it is not published on npm. Existing `opentakeoff-app` / `opentakeoff-mcp` local wrappers remain compatible. New projects start blank, CDB stays visible in every workspace layout, and offline engine tools are distinct from the guarded opt-in live-browser tools.
+
+Upstream AGPL licensing, NOTICE, copyright and historical attribution remain intact. Protocol/schema IDs, `takeoff://` resources, saved formats, environment variables and storage keys remain upstream-compatible; product/package identity is separate. Historical release notes and translated READMEs describe upstream unless explicitly marked CDB.
+
 <div align="center">
 
 <a href="https://opentakeoff.kentucky-ai.com"><img src="docs/img/brand/hero.svg" alt="OpenTakeoff: the scan star beside the wordmark, and an agent tracing two rooms of a floor plan on their wall faces" width="100%"></a>
 
 **Measure construction plans in your browser, or hand the same engine to your AI agent.**<br/>
 Free, open source and local. Nothing uploads, and nobody has to sign up.
+
+**Upstream project links and publication badges (not CDB releases):**
 
 [![GitHub stars](https://img.shields.io/github/stars/Kentucky-ai/opentakeoff?style=flat&logo=github&label=stars&color=62d4dc)](https://github.com/Kentucky-ai/opentakeoff/stargazers)
 [![npm](https://img.shields.io/npm/v/opentakeoff-mcp?label=opentakeoff-mcp&color=62d4dc)](https://www.npmjs.com/package/opentakeoff-mcp)
@@ -13,7 +23,7 @@ Free, open source and local. Nothing uploads, and nobody has to sign up.
 [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-0e1a2e.svg)](LICENSE)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%99%A5-EA4AAA?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/Kentucky-ai)
 
-### [▶ Try it now](https://opentakeoff.kentucky-ai.com) &nbsp;·&nbsp; [🔌 Plug in your agent](#plug-it-into-your-agent) &nbsp;·&nbsp; [🛠 Send your first PR](#contribute)
+### [▶ Upstream demo (not CDB)](https://opentakeoff.kentucky-ai.com) &nbsp;·&nbsp; [🔌 Plug in your agent](#plug-it-into-your-agent) &nbsp;·&nbsp; [🛠 Send your first PR](#contribute)
 
 [日本語](README.ja.md) · [한국어](README.ko.md) · [简体中文](README.zh-Hans.md)
 
@@ -52,36 +62,34 @@ Local desktop agents can also control the open canvas through the opt-in [local 
 
 | | You are… | Start here | Time |
 |---|---|---|---|
-| 🧑‍🔧 | **An estimator with a bid due** | [Open the canvas](https://opentakeoff.kentucky-ai.com), click **Guided first takeoff**, then read the [user manual](docs/USER_GUIDE.md) | 5 min |
-| 🤖 | **An AI agent, or the person wiring one up** | Run `npx -y opentakeoff-mcp` (see [Plug it into your agent](#plug-it-into-your-agent)), then read the [agent manual](docs/AGENT_GUIDE.md) | 1 min |
+| 🧑‍🔧 | **An estimator with a bid due** | [Build and open the CDB canvas](docs/CDB_SECOND_MACHINE.md), then read the [user manual](docs/USER_GUIDE.md) | 5 min |
+| 🤖 | **An AI agent, or the person wiring one up** | Run the locally built CDB MCP (see [Plug it into your agent](#plug-it-into-your-agent)), then read the [agent manual](docs/AGENT_GUIDE.md) | 1 min |
 | 🛠 | **A developer** | Read [AGENTS.md](AGENTS.md) for the repo map, [FEATURES.md](FEATURES.md) for where each feature lives in the code, then [Contribute](#contribute) | 10 min |
 | 🏗 | **A crew that wants its own copy** | [Fork it](#fork-it). Any static host will run it, and nothing phones home | 5 min |
 
 ## Plug it into your agent
 
-The server needs Node 20 or newer. You don't need to clone or build anything. Pick your client:
+Build the checkout first (Node 24 for the full repo):
 
-| Client | Install |
-|---|---|
-| **Claude Code** | `claude mcp add opentakeoff -- npx -y opentakeoff-mcp` |
-| **Codex CLI** | `codex mcp add opentakeoff -- npx -y opentakeoff-mcp` |
-| **Cursor** | [![Install in Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=opentakeoff&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIm9wZW50YWtlb2ZmLW1jcCJdfQ%3D%3D) |
-| **VS Code** | [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_server-0098FF?logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=opentakeoff&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22opentakeoff-mcp%22%5D%7D) |
-| **Claude Desktop** | Double-click [`opentakeoff-mcp.mcpb`](https://github.com/Kentucky-ai/opentakeoff/releases/latest/download/opentakeoff-mcp.mcpb) |
-| **Docker** (from a clone) | `docker build -f mcp/Dockerfile -t opentakeoff-mcp . && docker run --rm -i opentakeoff-mcp` |
-| **Any other stdio client** | Use the JSON below |
+```sh
+npm ci --prefix web
+npm ci --prefix mcp
+npm run build --prefix mcp
+```
+
+The checked-in [`.mcp.json`](.mcp.json) and [`.cursor/mcp.json`](.cursor/mcp.json) run `node mcp/dist/server.js`. **Launch the client from the repository root.** [VS Code](.vscode/mcp.json) uses `${workspaceFolder}/mcp/dist/server.js`; open this repo as the workspace folder. Node must be on the client PATH. For global registrations, or clients whose working directory differs, use absolute paths:
 
 ```json
 {
   "mcpServers": {
-    "opentakeoff": { "command": "npx", "args": ["-y", "opentakeoff-mcp"] }
+    "cdb-opentakeoff": { "command": "node", "args": ["/ABSOLUTE/PATH/TO/opentakeoff/mcp/dist/server.js"] }
   }
 }
 ```
 
-**If you've cloned the repo**, the root [`.mcp.json`](.mcp.json), [`.cursor/mcp.json`](.cursor/mcp.json)
-and [`.vscode/mcp.json`](.vscode/mcp.json) register the server when you open the folder, so
-there's nothing else to set up.
+Claude Code: `claude mcp add cdb-opentakeoff -- node /ABSOLUTE/PATH/TO/opentakeoff/mcp/dist/server.js`. Codex: `codex mcp add cdb-opentakeoff -- node /ABSOLUTE/PATH/TO/opentakeoff/mcp/dist/server.js`. Replace the path before running. Claude Desktop and other stdio clients can use the same JSON. No CDB npm or MCPB release is published. See [second-machine setup](docs/CDB_SECOND_MACHINE.md) for the app, wrappers and live-browser verification.
+
+The public `opentakeoff-mcp` npm package, upstream registry listings and release bundles belong to Kentucky AI, not this fork. Do not use them to install CDB.
 
 **Your first prompt.** Paste this once the server is connected:
 
@@ -104,6 +112,7 @@ The server can also describe itself: read the `takeoff://wiki` resource before y
 | **Measure** | `measure_polygon` · `cut_out` · `measure_line` · `measure_surface` · `place_count` · `count_marks` |
 | **Repeat and derive** | `symbol_sweep` · `sweep_schedule_row` · `derive_base` · `derive_transitions` · `apply_rules` |
 | **Read the drawing set** | `sheet_graph` · `resolve_tag` · `find_schedule` |
+| **Live browser (opt-in)** | `live_browser_status` · `live_browser_state` · `live_remove_unused_conditions` |
 | **Edit and audit** | `list_shapes` · `edit_shape` · `edit_condition` · `edit_materials` · `duplicate_condition` · `split_condition` · `delete_shape` · `undo_last` · `scope_duplicates` · `scope_merge` |
 | **Propose for review** | `propose_takeoff` · `revise_proposal` · `withdraw_proposal` · `propose_condition_edit` · `withdraw_condition_edit` |
 | **Mark and sign** | `annotate` · `list_annotations` · `edit_annotation` · `link_annotation` · `mark_verdict` · `delete_verdict` |

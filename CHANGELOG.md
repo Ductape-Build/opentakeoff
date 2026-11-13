@@ -15,6 +15,8 @@ Click **Pin** beside **Sheets** in the top toolbar, then click two corners aroun
 
 ## Unreleased
 
+- **CDB fork identity.** App title and AI connection guide, MCP initialize/package/discovery metadata and repository guidance now identify Ductape-Build explicitly. Checked-in clients run the built fork, never upstream npx. The MCP is private and source-only; inherited publishing is upstream-repository-only. No saved format or protocol IDs changed.
+
 - **Ductape-Build fork: live-browser MCP cleanup.** Dedicated live status/state tools distinguish the canvas from the independent engine. Unused-condition removal requires exact workspace/revision/id-tag targets, zero shapes, no pending proposals and a verified private disk backup. The preview bridge supports pinned loopback ports (desktop 5188) and refuses multiple canvases. See `docs/LOCAL_AGENT.md`.
 
 - **Ductape-Build fork: bulk scale.** Scale → Apply scale to sheets scans all loaded PDF pages and applies a chosen scale to selected unscaled sheets. Select matching sheets excludes unknown, mixed and conflicting printed scales. Existing calibrations are never overwritten; closed sheets with dimensional work are protected. Open-sheet quantities are recalculated in one update. See `docs/BULK_SCALE.md`.

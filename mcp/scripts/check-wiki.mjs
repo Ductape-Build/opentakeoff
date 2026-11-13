@@ -39,7 +39,7 @@ export function wikiBundle(root = defaultRoot) {
       const target = posix.normalize(posix.join(posix.dirname(source), path));
       if (target.startsWith('../')) throw new Error(`${source}: link escapes the repository: ${href}`);
       const wikiKey = keysBySource.get(target);
-      const link = wikiKey ? uriFor(wikiKey) : `https://github.com/Kentucky-ai/opentakeoff/blob/main/${target}`;
+      const link = wikiKey ? uriFor(wikiKey) : `https://github.com/Ductape-Build/opentakeoff/blob/cdb-development/${target}`;
       // Resources address complete pages; section headings remain in the page.
       return `](${link}${!wikiKey && fragment ? `#${fragment}` : ''})`;
     });

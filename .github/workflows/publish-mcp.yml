@@ -24,6 +24,8 @@ permissions:
 
 jobs:
   publish:
+    # CDB fork is source-only. Never publish inherited upstream npm/registry identities.
+    if: github.repository == 'Kentucky-ai/opentakeoff'
     runs-on: ubuntu-latest
     environment: release # OIDC trust boundary for npm trusted publishing — no required reviewer (removed 2026-07-22)
     defaults:

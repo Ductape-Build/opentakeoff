@@ -78,7 +78,7 @@ async function runSmoke(root, staged) {
   };
   try {
     send(child, { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-03-26", capabilities: {}, clientInfo: { name: "opentakeoff-dist-smoke", version: "0.0.0" } } });
-    const initialized = await responseFor(1); assert.equal(initialized.serverInfo.name, "opentakeoff");
+    const initialized = await responseFor(1); assert.equal(initialized.serverInfo.name, "cdb-opentakeoff-mcp");
     send(child, { jsonrpc: "2.0", method: "notifications/initialized" });
     send(child, { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
     const listed = await responseFor(2);

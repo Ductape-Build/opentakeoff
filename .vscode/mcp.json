@@ -1,9 +1,9 @@
 {
   "servers": {
-    "opentakeoff": {
+    "cdb-opentakeoff": {
       "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "opentakeoff-mcp"]
+      "command": "node",
+      "args": ["${workspaceFolder}/mcp/dist/server.js"]
     }
   }
 }

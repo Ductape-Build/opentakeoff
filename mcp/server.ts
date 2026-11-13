@@ -25,11 +25,11 @@ export function buildServer(
 ): McpServer {
   const staged = opts.stagedTools ?? process.env.OPENTAKEOFF_MCP_STAGED_TOOLS === "1";
   const oneClick = oneClickEnabled(opts.oneClick);
-  const server = new McpServer({ name: "opentakeoff", version: pkg.version }, {
+  const server = new McpServer({ name: "cdb-opentakeoff-mcp", title: "CDB OpenTakeoff (Ductape-Build fork)", version: pkg.version }, {
     // Served to every client at initialize — the discipline that makes agent
     // takeoffs land as reviewable work instead of a bare numbers report.
     instructions: [
-      "OpenTakeoff: quantity takeoff on construction plan PDFs.",
+      "CDB OpenTakeoff: Ductape-Build downstream fork of Kentucky-ai/opentakeoff, not the official upstream MCP. Local source build; not published on npm. Quantity takeoff on construction plan PDFs.",
       "BROWSER VS ENGINE: normal tools operate the independent offline MCP session, NOT the user canvas. For the opt-in local browser use live_browser_status then live_browser_state and verify identity/source_files; only live_remove_unused_conditions writes the browser, with mandatory backup and zero-shape guard. Never imply browser connectivity from load_plan.",
       "Knowledge: read takeoff://wiki for the task router, then only the relevant takeoff://wiki/{page}. Pages cover capability limits, architecture, protocol, workflows, MCP routing and domain knowledge; takeoff://wiki/tool-index lists tool stages and required inputs. These resources work before loading a plan and do not change the session.",
       "A takeoff's deliverable is the marked-up planset, not a numbers report. Standard finish for ANY takeoff:",

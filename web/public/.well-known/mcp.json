@@ -1,18 +1,19 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.Kentucky-ai/opentakeoff",
-  "title": "OpenTakeoff",
-  "description": "Construction takeoff for AI agents: load plans, set scale, measure, count, export with provenance.",
-  "websiteUrl": "https://opentakeoff.kentucky-ai.com",
+  "distribution": "local-source-only",
+  "installation": "Build this checkout, then run node mcp/dist/server.js from the repository root. This is not an MCP Registry listing or npm release.",
+  "name": "io.github.Ductape-Build/cdb-opentakeoff",
+  "title": "CDB OpenTakeoff (Ductape-Build fork)",
+  "description": "CDB downstream fork of Kentucky-ai/opentakeoff. Local source only; offline engine and guarded opt-in live browser tools.",
+  "websiteUrl": "https://github.com/Ductape-Build/opentakeoff/tree/cdb-development",
   "repository": {
-    "url": "https://github.com/Kentucky-ai/opentakeoff",
+    "url": "https://github.com/Ductape-Build/opentakeoff",
     "source": "github"
   },
   "version": "0.9.105",
   "packages": [
     {
-      "registryType": "npm",
-      "identifier": "opentakeoff-mcp",
+      "registryType": "local",
+      "identifier": "cdb-opentakeoff-mcp",
       "version": "0.9.105",
       "transport": {
         "type": "stdio"
